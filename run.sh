@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python -m cerberus.actions
+python -m cerberus.process_image
