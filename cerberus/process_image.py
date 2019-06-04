@@ -1,13 +1,25 @@
 import cv2
 import numpy as np
 from PIL import Image
-
 import imutils
 
 FILEPATH = 'venv/test/locked.jpg'
 EXPECTED = (122, 1154)
 CROPSIZE = (100, 100) # <- added: what size do you want to extract
 
+
+def take_picture(filepath):
+    # initialize the camera
+    cam = cv2.VideoCapture(0)  # 0 -> index of camera
+    s, img = cam.read()
+    if s:  # frame captured without any errors
+        # cv2.namedWindow("cam-test", cv2.CV_WINDOW_AUTOSIZE)
+        # cv2.imshow("cam-test", img)
+        # cv2.waitKey(0)
+        # cv2.destroyWindow("cam-test")
+        if filepath:
+            cv2.imwrite(filepath, img)  # save image
+    return Image.fromarray(img)
 
 def in_range(expected_tuple, found_tuple):
     x_ex_pos = expected_tuple[0]
@@ -152,11 +164,11 @@ def generate_cropped_file(out_file_path):
     im.save(out_file_path)
 
 
-def run():
-    temppath = "temp.jpg"
-    generate_cropped_file(temppath)
+def run(filepath):
+    # temppath = "temp.jpg"
+    generate_cropped_file(filepath)
 
-    cropped_image = cv2.imread(temppath, 1)
+    cropped_image = cv2.imread(filepath, 1)
 
     found_blob = detect_blob(cropped_image)
 
