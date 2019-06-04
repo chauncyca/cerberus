@@ -10,6 +10,7 @@ ERROR_LOG = "error.log"
 UNKNOWN_COUNT = 0
 STATE = -1
 
+
 class CerberusServer(socketserver.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -18,20 +19,21 @@ class CerberusServer(socketserver.BaseRequestHandler):
         response = dict()
 
         try:
-            response = self.process(self.data.decode())
+            response = process(self.data.decode())
         except:
             logging.exception("Failed to parse data: ", self.data)
 
         self.request.sendall(response)
 
-    def process(self, message):
-        output = bin()
 
-        if message == "GET_IMAGE":
-            output = perform_actions.get_picture().encode()
-        elif message == "GET_LOCK_STATE":
-            output = STATE.encode()
-        return output
+def process(message):
+    output = bin()
+
+    if message == "GET_IMAGE":
+        output = perform_actions.get_picture().encode()
+    elif message == "GET_LOCK_STATE":
+        output = STATE.encode()
+    return output
 
 
 def check_state():
