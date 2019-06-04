@@ -155,8 +155,10 @@ def detect_blob(bgr_img):
     return im_with_keypoints
 
 
-def generate_cropped_file(out_file_path):
-    gray_img = cv2.imread(FILEPATH, 0)
+def generate_cropped_file(out_file_path, filepath):
+    if not filepath:
+        filepath = FILEPATH
+    gray_img = cv2.imread(filepath, 0)
     gray_img = cv2.medianBlur(gray_img, 5)
 
     im_dict = find_circles(gray_img)
@@ -165,17 +167,17 @@ def generate_cropped_file(out_file_path):
 
 
 def run(filepath):
-    # temppath = "temp.jpg"
-    generate_cropped_file(filepath)
+    temppath = "temp.jpg"
+    generate_cropped_file(temppath, filepath)
 
-    cropped_image = cv2.imread(filepath, 1)
+    cropped_image = cv2.imread(temppath, 1)
 
     found_blob = detect_blob(cropped_image)
 
     retval = dict()
     retval["orig"] = find_center_of_circles(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY))
     retval["blob"] = find_center_of_circles(cv2.cvtColor(found_blob, cv2.COLOR_BGR2GRAY))
-    #
+
     # cv2.imshow('detected circles', cropped_image)
     # cv2.imshow('detected blob', found_blob)
     #
