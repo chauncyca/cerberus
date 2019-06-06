@@ -65,9 +65,9 @@ def find_center_of_circles(gray_img):
                                param1=30, param2=20, minRadius=2, maxRadius=200)
     circles = np.uint16(np.around(circles))
 
-    for i in circles[0, :]:
-        cv2.circle(gray_img, (i[0], i[1]), i[2], (0, 255, 0), 2)
-        cv2.imshow("circs", gray_img)
+    # for i in circles[0, :]:
+    #     cv2.circle(gray_img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+    #     cv2.imshow("circs", gray_img)
 
     retval = []
     for i in circles[0, :]:
@@ -171,10 +171,10 @@ def generate_cropped_file(out_file_path, filepath):
     gray_img = cv2.imread(filepath, 0)
     gray_img = cv2.medianBlur(gray_img, 5)
 
-    cv2.imshow('detected circles', gray_img)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow('detected circles', gray_img)
+    #
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     im_dict = find_circles(gray_img)
     im = Image.fromarray(im_dict["cropped"])
