@@ -4,11 +4,12 @@ from PIL import Image
 import imutils
 
 FILEPATH = 'venv/test/locked.jpg'
-EXPECTED = (122, 1154)
-CROPSIZE = (100, 100) # <- added: what size do you want to extract
+EXPECTED = (314, 244)
+CROPSIZE = (50, 50) # <- added: what size do you want to extract
 
 
 def take_picture(filepath):
+    # initialize the camera
     # initialize the camera
     cam = cv2.VideoCapture(0)  # 0 -> index of camera
     s, img = cam.read()
@@ -28,20 +29,19 @@ def in_range(expected_tuple, found_tuple):
     x_fd_pos = found_tuple[0]
     y_fd_pos = found_tuple[1]
 
-    return (x_fd_pos/x_ex_pos >= 1.05 or x_fd_pos/x_ex_pos <= 0.95) and\
-           (y_fd_pos/y_ex_pos >= 1.05 or y_fd_pos/y_ex_pos <= 0.95)
+    return (not(x_fd_pos/x_ex_pos >= 1.05 or x_fd_pos/x_ex_pos <= 0.95)) and\
+           (not(y_fd_pos/y_ex_pos >= 1.05 or y_fd_pos/y_ex_pos <= 0.95))
 
 def find_circles(gray_img):
     cimg = cv2.cvtColor(gray_img, cv2.COLOR_GRAY2BGR)
 
-    circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 700,
-                               param1=50, param2=30, minRadius=20, maxRadius=100)
+    circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 30,
+                               param1=30, param2=20, minRadius=10, maxRadius=200)
 
     circles = np.uint16(np.around(circles))
 
     retval = {}
     for i in circles[0, :]:
-
         if in_range(EXPECTED, (i[0], i[1])):
             # draw the outer circle
             cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
@@ -124,7 +124,7 @@ def detect_blob(bgr_img):
 
     # Filter by Area.
     params.filterByArea = True
-    params.minArea = 200
+    params.minArea = 5
 
     # Filter by Circularity
     params.filterByCircularity = True
@@ -161,6 +161,11 @@ def generate_cropped_file(out_file_path, filepath):
     gray_img = cv2.imread(filepath, 0)
     gray_img = cv2.medianBlur(gray_img, 5)
 
+    # cv2.imshow('detected circles', gray_img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     im_dict = find_circles(gray_img)
     im = Image.fromarray(im_dict["cropped"])
     im.save(out_file_path)
@@ -188,4 +193,4 @@ def run(filepath):
 
 
 if __name__ == "__main__":
-    print(run())
+    print(run(""))

@@ -1,7 +1,10 @@
 import datetime
 import logging
-import socketserver
 import threading
+try:
+    import socketserver
+except:
+    import SocketServer
 
 from . import perform_actions
 
@@ -73,9 +76,9 @@ def run():
         # If the server crashes suddenly, log it.
         except:
             logging.exception("Unresolved exception, Cerberus Server failure.")
-        server.server_close()
-        stop_msg = "Server Stops at %s" % str(datetime.datetime.now())
-        logging.warning(stop_msg)
+            server.server_close()
+            stop_msg = "Server Stops at %s" % str(datetime.datetime.now())
+            logging.warning(stop_msg)
 
 
 if __name__ == "__main__":
