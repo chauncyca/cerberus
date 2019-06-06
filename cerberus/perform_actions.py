@@ -12,7 +12,7 @@ def get_lock_state():
     centers = process_image.run(filepath)
 
     # centers = process_image.run()
-    if (len(centers["orig"]) == 1) and (len(centers["blob"]) == 2):
+    if (len(centers["orig"]) == 1) and (len(centers["blob"]) == 1):
         pic_center = centers["orig"][0]
         blob_center = tuple()
         for pos in centers["blob"]:

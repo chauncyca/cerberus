@@ -61,9 +61,14 @@ def find_circles(gray_img):
 
 
 def find_center_of_circles(gray_img):
-    circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 25,
-                               param1=40, param2=30, minRadius=1, maxRadius=100)
+    circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 30,
+                               param1=30, param2=20, minRadius=2, maxRadius=200)
     circles = np.uint16(np.around(circles))
+
+    for i in circles[0, :]:
+        cv2.circle(gray_img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        cv2.imshow("circs", gray_img)
+
     retval = []
     for i in circles[0, :]:
         retval.append((i[0], i[1]))
@@ -149,10 +154,15 @@ def detect_blob(bgr_img):
     #     y = keyPoint.pt[1]
     #     s = keyPoint.size
 
+    center_list = []
+    for keypoint in keypoints:
+        center_list.append((np.around(keypoint.pt[0]), np.around(keypoint.pt[1])))
+
     # Draw green circles around detected blobs
-    im_with_keypoints = cv2.drawKeypoints(bgr_img, keypoints, np.array([]), (0, 255, 0),
-                                          cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    return im_with_keypoints
+    # im_with_keypoints = cv2.drawKeypoints(bgr_img, keypoints, np.array([]), (0, 255, 0),
+    #                                       cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    # return im_with_keypoints
+    return center_list
 
 
 def generate_cropped_file(out_file_path, filepath):
@@ -161,7 +171,7 @@ def generate_cropped_file(out_file_path, filepath):
     gray_img = cv2.imread(filepath, 0)
     gray_img = cv2.medianBlur(gray_img, 5)
 
-    # cv2.imshow('detected circles', gray_img)
+    cv2.imshow('detected circles', gray_img)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -177,11 +187,10 @@ def run(filepath):
 
     cropped_image = cv2.imread(temppath, 1)
 
-    found_blob = detect_blob(cropped_image)
-
     retval = dict()
+    retval["blob"] = detect_blob(cropped_image)
     retval["orig"] = find_center_of_circles(cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY))
-    retval["blob"] = find_center_of_circles(cv2.cvtColor(found_blob, cv2.COLOR_BGR2GRAY))
+    # retval["blob"] = find_center_of_circles(cv2.cvtColor(found_blob, cv2.COLOR_BGR2GRAY))
 
     # cv2.imshow('detected circles', cropped_image)
     # cv2.imshow('detected blob', found_blob)
