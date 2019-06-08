@@ -8,6 +8,7 @@ except:
 
 from . import perform_actions
 
+DEBUG = False
 ERROR_LOG = "error.log"
 UNKNOWN_COUNT = 0
 STATE = -1
@@ -18,23 +19,44 @@ class CerberusServer(socketserver.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
 
-        response = dict()
+        response = "Data"
 
         try:
-            response = process(self.data.decode())
+            global DEBUG
+            if not DEBUG:
+                response = process(self.data.decode())
         except:
             logging.exception("Failed to parse data: ", self.data)
 
-        self.request.sendall(response)
+        self.request.sendall(response.encode())
+
+
+class TimerThread():
+    def __init__(self, t, hFunction):
+        self.t = t
+        self.hFunction = hFunction
+        self.thread = threading.Timer(self.t, self.handle_function)
+
+    def handle_function(self):
+        self.hFunction()
+        self.thread = threading.Timer(self.t, self.handle_function)
+        self.thread.start()
+
+    def start(self):
+        self.thread.start()
+
+    def cancel(self):
+        self.thread.cancel()
 
 
 def process(message):
-    output = bin()
+    output = None
 
     if message == "GET_IMAGE":
-        output = perform_actions.get_picture().encode()
+        output = perform_actions.get_picture()
     elif message == "GET_LOCK_STATE":
-        output = STATE.encode()
+        global STATE
+        output = STATE
     return output
 
 
@@ -54,15 +76,16 @@ def check_state():
             logging.warning("State has remained unknown for %s seconds" % UNKNOWN_COUNT)
         UNKNOWN_COUNT = UNKNOWN_COUNT + 1
 
-    threading.Timer(1, check_state()).start()
-
 
 def run():
     logging.basicConfig(filename=ERROR_LOG)
 
-    check_state()
+    global DEBUG
+    if not DEBUG:
+        timer = TimerThread(1, check_state())
+        timer.start()
 
-    host, port = "localhost", 5555
+    host, port = "localhost", 55555
 
     # Create the server, binding to localhost on port 5555
     with socketserver.TCPServer((host, port), CerberusServer) as server:
